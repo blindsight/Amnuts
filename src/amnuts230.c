@@ -16,6 +16,7 @@
 #include "globals.h"
 #include "commands.h"
 #include "prototypes.h"
+#include "phpinterface.h"
 #undef __MAIN_FILE__
 #endif
 
@@ -6409,6 +6410,31 @@ who(UR_OBJECT user, int type)
   }
   write_user(user,
              "+----------------------------------------------------------------------------+\n");
+
+		if (!amnuts_php_initialize()) {
+		    return;
+		}
+
+		if (!amnuts_php_evalf(__func__, "echo \"My name is %s\n\";", user->name)) {
+		    return;
+		}
+
+		AMNUTS_PHP_SET_STRINGL("name",  user->name);
+
+		if (!amnuts_php_eval(__func__, "$amnuts = \"My name is $name\";")) {
+		    return;
+		}
+
+		//char *value;
+		
+		char *value = AMNUTS_PHP_GET_STRINGL("amnuts", value);
+		//    return;
+			//}
+
+		vwrite_user(user,"%s\n", value);
+
+		amnuts_php_finalize();
+		
 }
 
 

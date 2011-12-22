@@ -14,6 +14,7 @@
 #include "globals.h"
 #include "commands.h"
 #include "prototypes.h"
+#include "phpinterface.h"
 
 /***************************************************************************/
 
@@ -68,9 +69,26 @@ say(UR_OBJECT user, char *inpstr)
     write_monitor(user, user->room, 0);
   }
   name = user->vis ? user->recap : invisname;
-  sprintf(text, "%s~RS ~FG%ss~RS: %s~RS\n", name, type, inpstr);
-  record(user->room, text);
-  write_room_except(user->room, text, user);
+ // sprintf(text, "%s~RS ~FG%ss~RS: %s~RS\n", name, type, inpstr);
+  
+   record(user->room, text);
+   
+  if (!amnuts_php_initialize()) {
+     return;
+  }
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("type",  type);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+   
+   if (!amnuts_php_eval(__func__, "echo \"$name~RS ~FG\" . $type . \"s~RS: $say_text\n\";")) {
+    return;
+   }
+
+  amnuts_php_finalize();
+  
+ 
+  //write_room_except(user->room, text, user);
   vwrite_user(user, "You ~FG%s~RS: %s~RS\n", type, inpstr);
 }
 

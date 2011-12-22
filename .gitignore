@@ -1,3 +1,7 @@
 .settings
 .cproject
 .project
+*.d
+*.o
+logfiles/
+userfiles/

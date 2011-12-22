@@ -14,6 +14,7 @@ INCDIR          = includes
 SRCDIR          = $(CURDIR)
 PERMS           = 755
 CC              = cc
+PHPBASE         = $(HOME)/Projects/talkerphp
 #CC             = cc -V 3.0.4 -std=c99 -D_XOPEN_SOURCE=600
 # This should take cpp args and cause dependancy info to go to stdout
 # It would be nice to use gcc -MMD to make this at the same time as compile
@@ -43,7 +44,12 @@ IDENTDCPPFLAGS = -I$(INCDIR)
 #IDENTDCPPFLAGS = -I$(INCDIR) -DMANDNS
 
 # These are sort of gcc dependant; roll your own if you use another compiler
-CFLAGS         = -g -O2 -Wall -W
+CFLAGS         = -g -O2 -Wall -W \
+                    -I$(PHPBASE)/include/php \
+                    -I$(PHPBASE)/include/php/main \
+                    -I$(PHPBASE)/include/php/Zend \
+                    -I$(PHPBASE)/include/php/TSRM
+
 #CFLAGS         = -g -O0 -fno-inline
 #CFLAGS         = -g -O2 -Wall -W -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wpacked -Wnested-externs -Winline -Wlong-long
 #CFLAGS         = -g -O2 -Wall -W -pedantic -Wfloat-equal -Wtraditional -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wpacked -Wpadded -Wredundant-decls -Wnested-externs -Wunreachable-code -Winline -Wlong-long
@@ -65,6 +71,7 @@ TALKEROBJS      = \
         $(OBJDIR)/strings.o \
         $(OBJDIR)/admin.o \
         $(OBJDIR)/spodlist.o \
+        $(OBJDIR)/phpinterface.o \
 
 IDENTDOBJS      = \
         $(OBJDIR)/ident.o \
@@ -72,7 +79,7 @@ IDENTDOBJS      = \
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
-        TALKERLIBS     = -lcrypto
+        TALKERLIBS     = -lcrypto -lresolv -ldl $(PHPBASE)/Projects/talkerphp/lib/libphp5.a
 endif
 
 ifeq ($(UNAME), SunOS)
