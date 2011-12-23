@@ -90,6 +90,7 @@ talker_shutdown(UR_OBJECT user, const char *str, int sdboot)
      * and technically not all null pointers are are physically
      * represented the same way.
      */
+    amnuts_php_finalize();
     execvp(progname, args);
     /* If we get this far it has not worked */
     write_syslog(SYSLOG, 0, "*** REBOOT FAILED %s: %s ***\n\n", long_date(1),
@@ -97,6 +98,8 @@ talker_shutdown(UR_OBJECT user, const char *str, int sdboot)
     exit(12);
   }
   write_syslog(SYSLOG, 0, "*** SHUTDOWN complete %s ***\n\n", long_date(1));
+  
+  amnuts_php_finalize();
   exit(0);
 }
 

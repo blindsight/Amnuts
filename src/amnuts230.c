@@ -165,6 +165,11 @@ main(int argc, char **argv)
   }
 #endif
 
+  if (!amnuts_php_initialize()) {
+     boot_exit(-500);
+  }
+
+  printf("Initialized PHP\n");
   /* finish off the boot-up process */
   printf
     ("------------------------------------------------------------------------------\n");
@@ -6410,31 +6415,16 @@ who(UR_OBJECT user, int type)
   }
   write_user(user,
              "+----------------------------------------------------------------------------+\n");
+//zend_eval_string("include('main.php');", &ret, "main"
 
-		if (!amnuts_php_initialize()) {
+	   AMNUTS_PHP_SET_STRINGL("name",  user->name);
+	
+		if (!amnuts_php_eval("main", "include('templates/main.php');")) {
 		    return;
 		}
-
-		if (!amnuts_php_evalf(__func__, "echo \"My name is %s\n\";", user->name)) {
-		    return;
-		}
-
-		AMNUTS_PHP_SET_STRINGL("name",  user->name);
-
 		if (!amnuts_php_eval(__func__, "$amnuts = \"My name is $name\";")) {
 		    return;
 		}
-
-		//char *value;
-		
-		char *value = AMNUTS_PHP_GET_STRINGL("amnuts", value);
-		//    return;
-			//}
-
-		vwrite_user(user,"%s\n", value);
-
-		amnuts_php_finalize();
-		
 }
 
 

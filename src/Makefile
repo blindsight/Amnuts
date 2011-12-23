@@ -79,7 +79,7 @@ IDENTDOBJS      = \
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
-        TALKERLIBS     = -lcrypto -lresolv -ldl $(PHPBASE)/Projects/talkerphp/lib/libphp5.a
+        TALKERLIBS     = -lcrypto -lresolv -ldl $(PHPBASE)/lib/libphp5.a
 endif
 
 ifeq ($(UNAME), SunOS)

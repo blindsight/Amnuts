@@ -72,22 +72,15 @@ say(UR_OBJECT user, char *inpstr)
  // sprintf(text, "%s~RS ~FG%ss~RS: %s~RS\n", name, type, inpstr);
   
    record(user->room, text);
-   
-  if (!amnuts_php_initialize()) {
-     return;
-  }
-  
+     
   AMNUTS_PHP_SET_STRINGL("name",  name);
   AMNUTS_PHP_SET_STRINGL("type",  type);
   AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
    
    if (!amnuts_php_eval(__func__, "echo \"$name~RS ~FG\" . $type . \"s~RS: $say_text\n\";")) {
-    return;
+     return;
    }
 
-  amnuts_php_finalize();
-  
- 
   //write_room_except(user->room, text, user);
   vwrite_user(user, "You ~FG%s~RS: %s~RS\n", type, inpstr);
 }

@@ -28,7 +28,7 @@ amnuts_php_set_string(const char *name, const char *value,
 
 
 char
-*amnuts_php_get_string(const char *name, char  *value, size_t name_len)
+*amnuts_php_get_string(const char *name, size_t name_len)
 {
     if (name_len == 0) {
         name_len = strlen(name) + 1;
@@ -65,6 +65,12 @@ amnuts_php_eval(const char *source, const char *code)
     return result;
 }
 
+/*
+if (!amnuts_php_evalf(__func__, "echo \"My name is %s\n\";", user->name)) {
+    return;
+}
+
+*/
 
 bool
 amnuts_php_evalf(const char *source, const char *fmt, ...)
@@ -110,11 +116,15 @@ amnuts_php_log_message(char *str)
 static void
 amnuts_php_sapi_error(int type, const char *fmt, ...)
 {
-    va_list ap;
-    va_start(ap, fmt);
-    (void)vfprintf(stderr, fmt, ap);
-    (void)fputs("\n", stderr);
-    va_end(ap);
+    va_list args;
+
+    *vtext = '\0';
+    va_start(args, fmt);
+    vsprintf(vtext, fmt, args);
+    va_end(args);
+	
+	write_room(NULL, vtext);
+    va_end(args);
 }
 
 #define amnuts_php_shutdown php_module_shutdown_wrapper
@@ -169,7 +179,7 @@ amnuts_php_initialize()
 	signal(SIGPIPE, SIG_IGN);
 
     sapi_startup(&g_amnuts_php_module);
-
+ 
     if (g_amnuts_php_module.startup(&g_amnuts_php_module) == FAILURE) {
       return false;
     }
@@ -204,3 +214,15 @@ amnuts_php_finalize()
     tsrm_shutdown();
 #endif
 }
+
+/* {{{ proto void hello_print(void)
+*   Print a message to show how much PHP extensions rock */
+PHP_FUNCTION(amnuts_hello_print)
+{
+    php_printf("Hello, world!\n");
+}/* }}} */
+
+static function_entry php_amnuts_functions[] = {
+    PHP_FE(amnuts_hello_world,        NULL)
+    { NULL, NULL, NULL }
+};
