@@ -14,6 +14,7 @@
 #include "globals.h"
 #include "commands.h"
 #include "prototypes.h"
+#include "phpinterface.h"
 
 /*****************************************************************************/
 
@@ -3748,14 +3749,25 @@ system_details(UR_OBJECT user)
                 "netlinks", nlcount, (int) (sizeof *nl),
                 nlcount * (int) (sizeof *nl));
 #endif
+    long memory_usage_by_zend = zend_memory_usage(0 TSRMLS_CC);
+    long memory_peak_by_zend = zend_memory_peak_usage(0 TSRMLS_CC);
+    
     write_user(user,
                "+----------------------------------------------------------------------------+\n");
+    vwrite_user(user,"| Zend Memory Usage      : %25ld bytes                   |\n",memory_usage_by_zend);
+    vwrite_user(user,"| Zend Memory Peak Usage : %25ld bytes                   |\n", memory_peak_by_zend);
+    
+    write_user(user,
+               "+----------------------------------------------------------------------------+\n");
+    
+    
+    
     vwrite_user(user,
-                "| %-16.16s: %12.3f Mb             %8d total bytes         |\n",
-                "total", tsize / 1048576.0, tsize);
+                "| %-16.16s: %12.3f Mb             %8ld total bytes         |\n",
+                "total", (tsize+memory_usage_by_zend) / 1048576.0, tsize+memory_usage_by_zend);
     if (!strcasecmp("-m", word[1])) {
-		write_user(user,
-				   "+----------------------------------------------------------------------------+\n\n");
+    write_user(user,
+            "+----------------------------------------------------------------------------+\n\n");
 		return;
     }
   }

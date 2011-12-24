@@ -143,6 +143,7 @@ main(int argc, char **argv)
   }
 
   /* Run in background automatically. */
+  //TODO: removed for debug
   switch (fork()) {
   case -1:
     /* fork failure */
@@ -6415,16 +6416,6 @@ who(UR_OBJECT user, int type)
   }
   write_user(user,
              "+----------------------------------------------------------------------------+\n");
-//zend_eval_string("include('main.php');", &ret, "main"
-
-	   AMNUTS_PHP_SET_STRINGL("name",  user->name);
-	
-		if (!amnuts_php_eval("main", "include('templates/main.php');")) {
-		    return;
-		}
-		if (!amnuts_php_eval(__func__, "$amnuts = \"My name is $name\";")) {
-		    return;
-		}
 }
 
 
@@ -6939,12 +6930,12 @@ void
 status(UR_OBJECT user)
 {
   char ir[ROOM_NAME_LEN + 1], text2[ARR_SIZE], text3[ARR_SIZE], rm[3],
-    qcall[USER_NAME_LEN];
+  qcall[USER_NAME_LEN];
   char email[82], nm[5], muzlev[20], arrlev[20];
   UR_OBJECT u;
   int days, hours, mins, hs, on, cnt, newmail;
   time_t t_expire;
-
+  
   if (word_count < 2) {
     u = user;
     on = 1;
@@ -7107,8 +7098,8 @@ status(UR_OBJECT user)
                 u->logout_room, rm);
     vwrite_user(user, "Last site     : %s\n", u->last_site);
     t_expire =
-      u->last_login + 86400 * (u->level ==
-                               NEW ? NEWBIE_EXPIRES : USER_EXPIRES);
+    u->last_login + 86400 * (u->level ==
+                             NEW ? NEWBIE_EXPIRES : USER_EXPIRES);
     strftime(text2, ARR_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime(&t_expire));
     vwrite_user(user, "User Expires  : %-13.13s  On date : %s\n",
                 noyes[u->expire], text2);
@@ -7119,7 +7110,6 @@ status(UR_OBJECT user)
     done_retrieve(u);
   }
 }
-
 
 /*
  * Examine a user
@@ -8821,6 +8811,10 @@ show_version(UR_OBJECT user)
                "| Compiled netlinks        : ~OLNO~RS                                              |\n");
 #endif
   }
+  write_user(user,
+             "+----------------------------------------------------------------------------+\n");
+  vwrite_user(user,
+              "| PHP Version : ~OL%-16s~RS   Zend Version   : ~OL%-16s~RS         |\n", PHP_VERSION, ZEND_VERSION);
   /* YOU MUST *NOT* ALTER THE REMAINING LINES */
   write_user(user,
              "+----------------------------------------------------------------------------+\n");

@@ -153,6 +153,18 @@ sapi_module_struct g_amnuts_php_module = {
 };
 
 
+
+PHP_FUNCTION(hello_print)
+{
+    php_printf("Hello World!\n");
+}
+
+
+zend_function_entry my_functions[] = {
+	PHP_FE(hello_print, NULL)
+	{NULL, NULL, NULL}
+};
+
 bool 
 amnuts_php_initialize()
 {
@@ -177,6 +189,8 @@ amnuts_php_initialize()
 #endif
 
 	signal(SIGPIPE, SIG_IGN);
+    
+    g_amnuts_php_module.additional_functions = my_functions;
 
     sapi_startup(&g_amnuts_php_module);
  
@@ -214,15 +228,3 @@ amnuts_php_finalize()
     tsrm_shutdown();
 #endif
 }
-
-/* {{{ proto void hello_print(void)
-*   Print a message to show how much PHP extensions rock */
-PHP_FUNCTION(amnuts_hello_print)
-{
-    php_printf("Hello, world!\n");
-}/* }}} */
-
-static function_entry php_amnuts_functions[] = {
-    PHP_FE(amnuts_hello_world,        NULL)
-    { NULL, NULL, NULL }
-};

@@ -69,20 +69,23 @@ say(UR_OBJECT user, char *inpstr)
     write_monitor(user, user->room, 0);
   }
   name = user->vis ? user->recap : invisname;
- // sprintf(text, "%s~RS ~FG%ss~RS: %s~RS\n", name, type, inpstr);
-  
-   record(user->room, text);
      
   AMNUTS_PHP_SET_STRINGL("name",  name);
   AMNUTS_PHP_SET_STRINGL("type",  type);
   AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
-   
-   if (!amnuts_php_eval(__func__, "echo \"$name~RS ~FG\" . $type . \"s~RS: $say_text\n\";")) {
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  AMNUTS_PHP_SET_STRINGL("to_user", "");
+  
+    
+   if (!amnuts_php_eval("main", "include('templates/say.php');")) {
      return;
    }
 
-  //write_room_except(user->room, text, user);
-  vwrite_user(user, "You ~FG%s~RS: %s~RS\n", type, inpstr);
+  char *to_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  
+  record(user->room, to_room);
+  write_room_except(user->room, to_room, user);
+  write_user(user, AMNUTS_PHP_GET_STRINGL("to_user"));
 }
 
 
@@ -152,10 +155,26 @@ say_to(UR_OBJECT user, char *inpstr)
   }
   name = user->vis ? user->recap : invisname;
   n = u->vis ? u->recap : invisname;
-  sprintf(text, "(%s~RS) %s~RS ~FC%ss~RS: %s~RS\n", n, name, type, inpstr);
-  record(user->room, text);
-  write_room_except(user->room, text, user);
-  vwrite_user(user, "(%s~RS) You ~FC%s~RS: %s~RS\n", u->recap, type, inpstr);
+  
+  AMNUTS_PHP_SET_STRINGL("to_name",  n);
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  
+  AMNUTS_PHP_SET_STRINGL("type",  type);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  AMNUTS_PHP_SET_STRINGL("to_user", "");
+  
+  
+  if (!amnuts_php_eval("main", "include('templates/say_to.php');")) {
+    return;
+  }
+  
+  char *to_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  
+  record(user->room, to_room);
+   write_room_except(user->room, to_room, user);
+  write_user(user, AMNUTS_PHP_GET_STRINGL("to_user"));
+  
 }
 
 
