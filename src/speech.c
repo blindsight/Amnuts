@@ -220,10 +220,24 @@ shout(UR_OBJECT user, char *inpstr)
     write_monitor(user, NULL, 0);
   }
   name = user->vis ? user->recap : invisname;
-  sprintf(text, "~OL!~RS %s~RS ~OL%ss~RS: %s~RS\n", name, type, inpstr);
-  record_shout(text);
-  write_room_except(NULL, text, user);
-  vwrite_user(user, "~OL!~RS You ~OL%s~RS: %s~RS\n", type, inpstr);
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("type",  type);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  AMNUTS_PHP_SET_STRINGL("to_user", "");
+  
+  
+  if (!amnuts_php_eval("main", "include('templates/shout.php');")) {
+    return;
+  }
+  
+  char *to_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  
+  record_shout(to_room);
+  write_room_except(NULL, to_room, user);
+  write_user(user, AMNUTS_PHP_GET_STRINGL("to_user"));
+  
 }
 
 
@@ -307,9 +321,25 @@ tell_user(UR_OBJECT user, char *inpstr)
     type = "say";
   }
   name = user->vis || u->level >= user->level ? user->recap : invisname;
-  sprintf(text, "~OL~FG>~RS %s~RS ~FC%ss~RS: %s~RS\n", name, type, inpstr);
+  
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("to_name",  u->recap);
+  AMNUTS_PHP_SET_STRINGL("type",  type);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user", "");
+  AMNUTS_PHP_SET_STRINGL("to_tell_user", "");
+  
+  
+  if (!amnuts_php_eval("main", "include('templates/tell.php');")) {
+    return;
+  }
+  
+  char *to_tell_user = AMNUTS_PHP_GET_STRINGL("to_tell_user");
+  
+  
   if (u->afk) {
-    record_afk(user, u, text);
+    record_afk(user, u, to_tell_user);
     if (*u->afk_mesg) {
       vwrite_user(user, "%s~RS is ~FRAFK~RS, message is: %s\n", u->recap,
                   u->afk_mesg);
@@ -320,7 +350,7 @@ tell_user(UR_OBJECT user, char *inpstr)
     return;
   }
   if (u->malloc_start) {
-    record_edit(user, u, text);
+    record_edit(user, u, to_tell_user);
     vwrite_user(user,
                 "%s~RS is in ~FCEDIT~RS mode at the moment (using the line editor).\n",
                 u->recap);
@@ -340,12 +370,11 @@ tell_user(UR_OBJECT user, char *inpstr)
     return;
   }
 #endif
-  record_tell(user, u, text);
-  write_user(u, text);
-  sprintf(text, "~OL~FG>~RS (%s~RS) You ~FC%s~RS: %s~RS\n", u->recap, type,
-          inpstr);
-  record_tell(user, user, text);
-  write_user(user, text);
+  record_tell(user, u, to_tell_user);
+  write_user(u, to_tell_user);
+
+  record_tell(user, user,  AMNUTS_PHP_GET_STRINGL("to_user"));
+  write_user(user,  AMNUTS_PHP_GET_STRINGL("to_user"));
 }
 
 

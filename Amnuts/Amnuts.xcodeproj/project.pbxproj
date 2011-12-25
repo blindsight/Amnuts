@@ -382,6 +382,9 @@
 		96D2B28C14A56A7D003FC146 /* say_to.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = say_to.php; sourceTree = "<group>"; };
 		96D2B28D14A571AE003FC146 /* help_command_level.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = help_command_level.php; sourceTree = "<group>"; };
 		96D2B28E14A57667003FC146 /* status.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = status.php; sourceTree = "<group>"; };
+		96D2B28F14A6472E003FC146 /* shout.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = shout.php; sourceTree = "<group>"; };
+		96D2B29014A64AB2003FC146 /* tell.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = tell.php; sourceTree = "<group>"; };
+		96D2B29114A64DE8003FC146 /* list_money.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = list_money.php; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1000,6 +1003,9 @@
 				96D2B28C14A56A7D003FC146 /* say_to.php */,
 				96D2B28D14A571AE003FC146 /* help_command_level.php */,
 				96D2B28E14A57667003FC146 /* status.php */,
+				96D2B28F14A6472E003FC146 /* shout.php */,
+				96D2B29014A64AB2003FC146 /* tell.php */,
+				96D2B29114A64DE8003FC146 /* list_money.php */,
 			);
 			name = templates;
 			path = ../templates;

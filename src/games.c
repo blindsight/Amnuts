@@ -16,6 +16,7 @@
 #include "globals.h"
 #include "commands.h"
 #include "prototypes.h"
+#include "phpinterface.h"
 
 /*****************************************************************************/
 
@@ -535,10 +536,11 @@ check_credit_updates(void)
 void
 global_money(UR_OBJECT user)
 {
+  char main_content[OUT_BUFF_SIZE];
   UR_OBJECT u;
   const char *name;
   int cash;
-
+  
   if (word_count < 2) {
     write_user(user, "Usage: money -l/-g/-t [<user> <amount>]\n");
     return;
@@ -548,54 +550,60 @@ global_money(UR_OBJECT user)
     char text2[ARR_SIZE];
     int x, cnt, user_cnt;
 
-    write_user(user,
-               "\n+----------------------------------------------------------------------------+\n");
-    write_user(user,
-               "| ~FC~OLUser money listings~RS                                                        |\n");
-    write_user(user,
-               "+----------------------------------------------------------------------------+\n");
     x = user_cnt = 0;
     *text2 = '\0';
+    main_content[0]='\0';
+    
     for (u = user_first; u; u = u->next) {
       ++user_cnt;
       cnt = 13 + teslen(u->recap, 13);
       if (!x) {
         /* build up first half of the string */
-        sprintf(text, "| %-*.*s $%6d ", cnt, cnt, u->recap, u->money);
+        sprintf(text, " %-*.*s $%6d ", cnt, cnt, u->recap, u->money);
+        strcat(main_content, text);
+        
+        *text = '\0';
         ++x;
       } else if (x == 1) {
         /* build up full line and print to user */
         sprintf(text2, "   %-*.*s $%6d   ", cnt, cnt, u->recap, u->money);
-        strcat(text, text2);
-        write_user(user, text);
-        *text = '\0';
+        strcat(main_content, text2);
+        
         *text2 = '\0';
         ++x;
       } else {
-        sprintf(text2, "   %-*.*s $%6d  |\n", cnt, cnt, u->recap, u->money);
-        strcat(text, text2);
-        write_user(user, text);
-        *text = '\0';
+        sprintf(text2, "   %-*.*s $%6d  \n", cnt, cnt, u->recap, u->money);
+        
+        strcat(main_content, text2);
         *text2 = '\0';
         x = 0;
       }
     }
     /* If you have only printed first half of the string */
-    if (x == 1) {
-      strcat(text,
-             "                                                     |\n");
-      write_user(user, text);
+    if (x == 1) {      
+      strcat(main_content, "                                                     \n");
     }
     if (x == 2) {
-      strcat(text, "                          |\n");
-      write_user(user, text);
+      strcat(main_content, "                          \n");
     }
-    write_user(user,
-               "+----------------------------------------------------------------------------+\n");
-    sprintf(text, "Total of ~OL%d~RS user%s", user_cnt, PLTEXT_S(user_cnt));
-    vwrite_user(user, "| %-80s |\n", text);
-    write_user(user,
-               "+----------------------------------------------------------------------------+\n\n");
+    
+    
+    sprintf(text2,"%d",user_cnt);
+    
+    AMNUTS_PHP_SET_STRINGL("total_users",  text2);
+    AMNUTS_PHP_SET_STRINGL("pltest_s",  PLTEXT_S(user_cnt));
+    AMNUTS_PHP_SET_STRINGL("main_content",  main_content);
+    AMNUTS_PHP_SET_STRINGL("to_user",  "");
+    
+    
+    if (!amnuts_php_eval("main", "include('templates/list_money.php');")) {
+      return;
+    }
+    
+    *text2 = '\0';
+    *text = '\0';
+    
+    write_user(user, AMNUTS_PHP_GET_STRINGL("to_user"));
     return;
   }
   /* give money to users */
