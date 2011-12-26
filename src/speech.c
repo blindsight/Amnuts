@@ -424,9 +424,18 @@ emote(UR_OBJECT user, char *inpstr)
     write_room(user->room, text);
     return;
   }
-  sprintf(text, "%s~RS%s%s~RS\n", name, *inpstr != '\'' ? " " : "", inpstr);
-  record(user->room, text);
-  write_room_ignore(user->room, user, text);
+
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+
+  if (!amnuts_php_eval("main", "include('templates/emote.php');")) {
+    return;
+  }
+  
+  char *to_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  record(user->room, to_room);
+  write_room_ignore(user->room, user, to_room);
 }
 
 
@@ -467,10 +476,19 @@ semote(UR_OBJECT user, char *inpstr)
     write_monitor(user, NULL, 0);
   }
   name = user->vis ? user->recap : invisname;
-  sprintf(text, "~OL!~RS %s~RS%s%s~RS\n", name, *inpstr != '\'' ? " " : "",
-          inpstr);
-  record_shout(text);
-  write_room_ignore(NULL, user, text);
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_talker", "");
+  
+  if (!amnuts_php_eval("main", "include('templates/semote.php');")) {
+    return;
+  }
+  
+  char *to_talker = AMNUTS_PHP_GET_STRINGL("to_talker");
+  
+  record_shout(to_talker);
+  write_room_ignore(NULL, user, to_talker);
 }
 
 
@@ -611,9 +629,18 @@ echo(UR_OBJECT user, char *inpstr)
     break;
   }
   write_monitor(user, user->room, 0);
-  sprintf(text, "+ %s~RS\n", inpstr);
-  record(user->room, text);
-  write_room(user->room, text);
+
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  
+  if (!amnuts_php_eval("main", "include('templates/echo.php');")) {
+    return;
+  }
+  
+  char *to_user_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+
+  record(user->room, to_user_room);
+  write_room(user->room, to_user_room);
 }
 
 
@@ -1370,13 +1397,19 @@ think_it(UR_OBJECT user, char *inpstr)
     write_monitor(user, user->room, 0);
   }
   name = user->vis ? user->recap : invisname;
-  if (word_count < 2) {
-    sprintf(text, "%s~RS thinks nothing--now that is just typical!\n", name);
-  } else {
-    sprintf(text, "%s~RS thinks . o O ( %s~RS )\n", name, inpstr);
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  
+  if (!amnuts_php_eval("main", "include('templates/think.php');")) {
+    return;
   }
-  record(user->room, text);
-  write_room(user->room, text);
+  
+  char *to_user_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  
+  record(user->room, to_user_room);
+  write_room(user->room, to_user_room);
 }
 
 
@@ -1417,13 +1450,19 @@ sing_it(UR_OBJECT user, char *inpstr)
     write_monitor(user, user->room, 0);
   }
   name = user->vis ? user->recap : invisname;
-  if (word_count < 2) {
-    sprintf(text, "%s~RS sings a tune...BADLY!\n", name);
-  } else {
-    sprintf(text, "%s~RS sings o/~ %s~RS o/~\n", name, inpstr);
+  
+  AMNUTS_PHP_SET_STRINGL("name",  name);
+  AMNUTS_PHP_SET_STRINGL("say_text",  inpstr);
+  AMNUTS_PHP_SET_STRINGL("to_user_room", "");
+  
+  if (!amnuts_php_eval("main", "include('templates/sing.php');")) {
+    return;
   }
-  record(user->room, text);
-  write_room(user->room, text);
+  
+  char *to_user_room = AMNUTS_PHP_GET_STRINGL("to_user_room");
+  
+  record(user->room, to_user_room);
+  write_room(user->room, to_user_room);
 }
 
 
